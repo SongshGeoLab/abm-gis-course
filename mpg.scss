@@ -1,0 +1,135 @@
+/*-- scss:defaults --*/
+/* Brand tokens (edit these hexes/fonts to match your PPT) */
+$brand-primary: #006c66 !default;          // main accent
+$brand-accent:  #0b5fad !default;          // links / secondary
+$brand-text:    #111111 !default;          // body text
+$brand-muted:   #666666 !default;
+$brand-bg:      #ffffff !default;
+
+$title-bg-start: #f5f7f7 !default;
+$title-bg-end:   #e9efef !default;
+
+$logo-size: 90px !default;
+$footer-size: 0.85rem !default;
+
+/* If you have a corp font, set names here (or leave to system UI) */
+$font-body:    "Arial", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !default;
+$font-heading: "Arial", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !default;
+
+/*-- scss:rules --*/
+
+/* Optional webfont (only if you have a licensed .woff2 in assets/)
+@font-face {
+  font-family: 'Corp Sans';
+  src: url('assets/corp-sans.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+/* Expose tokens as CSS variables for easy tweaking if needed */
+:root {
+  --brand-primary: #{$brand-primary};
+  --brand-primary-contrast: #ffffff;
+  --brand-accent: #{$brand-accent};
+  --brand-text: #{$brand-text};
+  --brand-muted: #{$brand-muted};
+  --brand-bg: #{$brand-bg};
+
+  --title-bg-start: #{$title-bg-start};
+  --title-bg-end:   #{$title-bg-end};
+
+  --logo-size: #{$logo-size};
+  --footer-size: #{$footer-size};
+}
+
+/* Base */
+/* Hide Quarto's auto-generated title slide entirely */
+.reveal .slides section.title-slide:first-of-type {
+  display: none !important;
+}
+
+.reveal {
+  background: var(--brand-bg);
+  color: var(--brand-text);
+  font-family: #{$font-body};
+}
+
+.reveal h1, .reveal h2, .reveal h3 {
+  font-family: #{$font-heading};
+  color: var(--brand-text);
+  letter-spacing: 0.2px;
+}
+.reveal a { color: var(--brand-accent); }
+.reveal a:hover { text-decoration: underline; }
+
+/* Logo + footer (Quarto injects these) */
+.reveal .slide-logo {
+  position: absolute;
+  width: var(--logo-size);
+  height: auto;
+  bottom: 18px;
+  right: 24px;
+  opacity: 0.95;
+}
+.reveal .footer {
+  font-size: var(--footer-size);
+  color: var(--brand-muted);
+  border-top: 1px solid #ddd;
+  padding-top: 6px;
+}
+
+/* Title slide */
+section.title-slide {
+  color: #ffffff;
+}
+section.title-slide h1 {
+  font-size: 2.4rem !important;   /* try half the default size */
+  line-height: 1.2;
+  margin-bottom: 0.25rem;
+  color: #ffffff !important;        /* white text */
+  text-transform: uppercase;        /* ALL CAPS */
+  letter-spacing: 1px;              /* optional: extra tracking */
+}
+
+section.title-slide .subtitle {
+  margin-top: 0.2rem;
+  font-size: 1rem;
+  color: var(--brand-muted);
+}
+
+/* Section divider slide */
+section.section-slide {
+  color: #ffffff;
+}
+section.section-slide h1,
+section.section-slide h2 {
+  color: var(--brand-primary-contrast);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Accents, tables, code */
+.reveal strong, .reveal b { color: var(--brand-primary); }
+.reveal blockquote {
+  border-left: 4px solid var(--brand-primary);
+  padding-left: 0.9rem;
+  color: #333;
+}
+.reveal table { border-collapse: collapse; font-size: 0.95rem; }
+.reveal table th, .reveal table td {
+  border-bottom: 1px solid #e5e5e5;
+  padding: 0.35rem 0.6rem;
+}
+.reveal table th { background: #f7f9f9; color: #222; }
+.reveal pre code { font-size: 0.9rem; line-height: 1.25; }
+.reveal code {
+  background: #f4f6f7;
+  padding: 0.15rem 0.3rem;
+  border-radius: 6px;
+}
+
+/* Utilities */
+.brand-accent { color: var(--brand-primary); }
+.small { font-size: 0.9rem; }

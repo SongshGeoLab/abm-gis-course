@@ -1,0 +1,55 @@
+---
+title: "Presentation Title"
+subtitle: "Optional Subtitle"
+author: "Your Name"
+date: today
+format: revealjs
+---
+
+:::{.title-slide 
+   background-image="/assets/title_bg.png" 
+   background-size="cover" 
+   background-position="center"}
+   
+# PRESENTATION TITLE
+
+:::
+
+---
+
+## Introduction
+
+- Brief point 1
+- Brief point 2
+- Brief point 3
+
+---
+
+## Section Title {.section-slide 
+   background-image="/assets/section_bg.png" 
+   background-size="cover" 
+   background-position="center"}
+
+# SECTION TITLE
+
+---
+
+## Key Points
+
+1. Explain the first major idea
+2. Highlight supporting evidence
+3. Conclude with a takeaway message
+
+---
+
+## Another Section {.section-slide 
+   background-image="/assets/section_bg.png" 
+   background-size="cover" 
+   background-position="center"}
+
+---
+
+## Conclusion
+
+- Summarize the key points
+- End with a call to action or future direction

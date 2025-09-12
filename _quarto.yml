@@ -1,0 +1,17 @@
+project:
+  type: website
+  resources:
+    - assets/**        # copy everything under assets
+
+format:
+  revealjs:
+    theme: [default, mpg.scss]
+    logo: /assets/logo.svg        # root-relative path is safest
+    slide-number: true
+    footer: "Max Planck Institute of Geoanthropology"
+    transition: fade
+    controls: true
+    toc: false
+    code-overflow: wrap
+    margin: 0                     # no outer margin, good for full-bleed bgs
+    title-slide: false            # disable Quarto's auto title slide
