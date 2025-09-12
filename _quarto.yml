@@ -6,9 +6,9 @@ project:
 format:
   revealjs:
     theme: [default, mpg.scss]
-    logo: /assets/logo.svg        # root-relative path is safest
+    logo: /assets/crest.png        # root-relative path is safest
     slide-number: true
-    footer: "Max Planck Institute of Geoanthropology"
+    footer: "Max Planck Institute of Geoanthropology | FIRST NAME LAST NAME"
     transition: fade
     controls: true
     toc: false
@@ -16,4 +16,5 @@ format:
     width: 1920
     height: 1080
     margin: 0.02                   # no outer margin, good for full-bleed bgs
-    title-slide: false            # disable Quarto's auto title slide
+    template-partials:
+      - title-slide.html
