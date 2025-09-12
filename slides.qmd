@@ -13,6 +13,8 @@ format: revealjs
    
 # PRESENTATION TITLE
 
+<p class="subtitle">Clarifying Subtitle</p>
+
 :::
 
 ---
@@ -25,24 +27,23 @@ format: revealjs
 
 ---
 
-## Section Title {.section-slide 
+## A SECTION {.section-slide 
    background-image="/assets/section_bg.png" 
    background-size="cover" 
    background-position="center"}
 
-# SECTION TITLE
-
 ---
 
 ## Key Points
-
+### some more headings
+#### and more
 1. Explain the first major idea
 2. Highlight supporting evidence
 3. Conclude with a takeaway message
 
 ---
 
-## Another Section {.section-slide 
+## ANOTHER SECTION {.section-slide 
    background-image="/assets/section_bg.png" 
    background-size="cover" 
    background-position="center"}
