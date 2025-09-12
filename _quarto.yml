@@ -13,5 +13,7 @@ format:
     controls: true
     toc: false
     code-overflow: wrap
-    margin: 0                     # no outer margin, good for full-bleed bgs
+    width: 1920
+    height: 1080
+    margin: 0.02                   # no outer margin, good for full-bleed bgs
     title-slide: false            # disable Quarto's auto title slide

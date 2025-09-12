@@ -8,7 +8,7 @@ format: revealjs
 
 :::{.title-slide 
    background-image="/assets/title_bg.png" 
-   background-size="cover" 
+   background-size="contain" 
    background-position="center"}
    
 # PRESENTATION TITLE
@@ -29,7 +29,7 @@ format: revealjs
 
 ## A SECTION {.section-slide 
    background-image="/assets/section_bg.png" 
-   background-size="cover" 
+   background-size="contain" 
    background-position="center"}
 
 ---
@@ -45,7 +45,7 @@ format: revealjs
 
 ## ANOTHER SECTION {.section-slide 
    background-image="/assets/section_bg.png" 
-   background-size="cover" 
+   background-size="contain" 
    background-position="center"}
 
 ---

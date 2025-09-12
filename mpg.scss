@@ -106,10 +106,10 @@ section.title-slide {
 
 section.title-slide h1 {
   position: absolute;
-  left: 5%;
+  left: 12%;
   top: 30%;
   width: 60%;
-  font-size: 2.4rem !important;   /* try half the default size */
+  font-size: 3.4rem !important;   /* try half the default size */
   line-height: 1.2;
   margin-bottom: 0.25rem;
   color: #ffffff !important;        /* white text */
@@ -119,10 +119,10 @@ section.title-slide h1 {
 
 section.title-slide .subtitle {
   position: absolute;
-  left: 5%;
-  top: 65%;
+  left: 12%;
+  top: 85%;
   width: 60%;
-  font-size: 1.2rem;
+  font-size: 2.2rem;
   color: #ffffff !important;
 }
 
@@ -136,10 +136,10 @@ section.section-slide {
 section.section-slide h1,
 section.section-slide h2 {
   position: absolute;
-  left: 5%;
+  left: 12%;
   top: 40%;
   width: 60%;
-  font-size: 2.4rem !important;   /* try half the default size */
+  font-size: 3.4rem !important;   /* try half the default size */
   line-height: 1.2;
   margin-bottom: 0.25rem;
   color: #ffffff !important;        /* white text */
@@ -173,7 +173,7 @@ section.section-slide h2 {
 
 /* Add padding inside normal slides */
 .reveal .slides section {
-  padding: 5rem 3rem;   /* top/bottom 2.5rem, left/right 3rem */
+  padding: 15rem 15rem;   /* top/bottom 2.5rem, left/right 3rem */
 }
 
 /* Don’t double-pad title and section slides (they’re absolutely positioned) */
