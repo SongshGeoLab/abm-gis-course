@@ -122,7 +122,7 @@ section.title-slide h1 {
 section.title-slide .subtitle {
   position: absolute;
   left: 12%;
-  top: 85%;
+  top: 79%;
   width: 60%;
   font-size: 2.2rem;
   color: #ffffff !important;
@@ -156,13 +156,13 @@ section.section-slide h2 {
   padding-left: 0.9rem;
   color: #333;
 }
-.reveal table { border-collapse: collapse; font-size: 0.95rem; }
+.reveal table { border-collapse: collapse; font-size: 0.7em; }
 .reveal table th, .reveal table td {
   border-bottom: 1px solid #e5e5e5;
   padding: 0.35rem 0.6rem;
 }
 .reveal table th { background: #f7f9f9; color: #222; }
-.reveal pre code { font-size: 0.9rem; line-height: 1.25; }
+.reveal pre code { font-size: 1.7rem; line-height: 1.35; max-height: none; }
 .reveal code {
   background: #f4f6f7;
   padding: 0.15rem 0.3rem;
@@ -176,6 +176,7 @@ section.section-slide h2 {
 /* Add padding inside normal slides */
 .reveal .slides section {
   padding: 2.5rem 3rem;   /* top/bottom 2.5rem, left/right 3rem */
+  box-sizing: border-box; /* keep padding inside the 1920px slide */
 }
 
 /* Don’t double-pad title and section slides (they’re absolutely positioned) */
@@ -183,3 +184,100 @@ section.section-slide h2 {
 .reveal .slides section.section-slide {
   padding: 0;
 }
+
+/* Title slide: author and date sit inside the teal box */
+section.title-slide .author,
+section.title-slide .date {
+  position: absolute;
+  left: 12%;
+  width: 60%;
+  margin: 0;
+  font-size: 1.6rem;
+  color: #ffffff !important;
+}
+section.title-slide .author { top: 64%; }
+section.title-slide .date   { top: 71%; }
+
+/* 5-step progress tracker shown at the top of workflow slides */
+.reveal .steps {
+  display: flex;
+  gap: 0.4em;
+  margin: -0.4em 0 0.5em;
+  font-size: 0.5em;
+}
+.reveal .steps span {
+  padding: 0.15em 0.8em;
+  border-radius: 999px;
+  background: #eef3f3;
+  color: #7a8a8a;
+}
+.reveal .steps span.on {
+  background: var(--brand-primary);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Boxes for flow diagrams and concept cards */
+.reveal .flow {
+  display: flex;
+  align-items: stretch;
+  gap: 0.4em;
+  margin: 0.6em 0;
+}
+.reveal .flow .box {
+  flex: 1;
+  border: 3px solid var(--brand-primary);
+  border-radius: 14px;
+  padding: 0.5em 0.6em;
+  text-align: center;
+  font-size: 0.8em;
+  line-height: 1.3;
+}
+.reveal .flow .box.fill { background: var(--brand-primary); color: #ffffff; }
+.reveal .flow .box.fill strong { color: #ffffff; }
+.reveal .flow .box strong { display: block; font-size: 1.25em; margin-bottom: 0.2em; }
+.reveal .flow .arrow {
+  align-self: center;
+  color: var(--brand-primary);
+  font-size: 1.4em;
+  font-weight: 700;
+}
+
+/* Screenshot placeholder: replace with ![](/assets/abm-gis/img/...) */
+.reveal .placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 16em;
+  padding: 0.8em;
+  border: 3px dashed var(--brand-primary);
+  border-radius: 14px;
+  background: #f3f8f8;
+  color: #4d6b69;
+  font-size: 0.6em;
+  text-align: center;
+}
+
+/* Tool labels above the NetLogo / Mesa-Geo columns */
+.reveal .tag {
+  display: inline-block;
+  padding: 0.1em 0.7em;
+  border-radius: 999px;
+  font-size: 0.6em;
+  font-weight: 700;
+}
+.reveal .tag.netlogo { background: #e7eef8; color: #0b5fad; }
+.reveal .tag.mesa    { background: #e3f1ef; color: #006c66; }
+.reveal .tag.qgis    { background: #edf5e3; color: #4a7a1f; }
+
+/* Small grey credit line under figures */
+.reveal .credit {
+  display: block;
+  margin-top: 0.3em;
+  font-size: 0.45em;
+  line-height: 1.3;
+  color: var(--brand-muted);
+}
+
+/* Code shown side by side needs to be a bit smaller */
+.reveal .columns pre code { font-size: 1.5rem; }

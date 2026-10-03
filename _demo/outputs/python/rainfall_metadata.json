@@ -1,0 +1,19 @@
+{
+  "model": "Rainfall (Mesa-Geo)",
+  "input": "elevation.asc (ABMGIS, CC BY-SA 4.0)",
+  "crs": "EPSG:4326 (assumed, not embedded in elevation.asc)",
+  "seed": 202408,
+  "rain_rate": 500,
+  "water_height": 5,
+  "steps": 12,
+  "contained": 5659,
+  "outflow": 341,
+  "fields": {
+    "water_level.tif": "water per cell = retained raindrops x water_height (model units)",
+    "raindrops.*": "unique_id, created_step, moves; point at the cell centre"
+  },
+  "versions": {
+    "mesa": "3.5.1",
+    "mesa_geo": "0.9.3"
+  }
+}

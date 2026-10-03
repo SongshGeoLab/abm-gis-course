@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="420" viewBox="0 0 1000 420" role="img" aria-labelledby="rn-title rn-desc">
+<title id="rn-title">Choose the lowest local raster score</title>
+<desc id="rn-desc">A three-by-three Moore neighborhood shows one score per cell. The orange center cell has score eight from elevation six plus water two. A short arrow points to the green upper-right cell, the minimum score four from elevation three plus water one. Three concise steps define the local decision.</desc>
+<defs><style>
+text{font-family:Inter,"Helvetica Neue",Arial,sans-serif;fill:#27343d;letter-spacing:0}.title{font-size:34px;font-weight:700}.subtitle{font-size:18px;fill:#5e707b}.score{font-size:28px;font-weight:700}.component{font-size:15px;fill:#5e707b}.heading{font-size:22px;font-weight:700}.rule{font-size:20px}.note{font-size:15px;fill:#5e707b}.num{font-size:22px;font-weight:700}.cell{fill:#e5eff4;stroke:#546873;stroke-width:1.8}.current{fill:#f8eadb;stroke:#b35d00;stroke-width:4}.selected{fill:#e2efe7;stroke:#2d6a4f;stroke-width:4}.panel{fill:#fafcfd;stroke:#c8d4da;stroke-width:2}.card{fill:#ffffff;stroke:#d8e1e5;stroke-width:1.5}.arrow{fill:none;stroke:#2d6a4f;stroke-width:6;stroke-linecap:round;marker-end:url(#arr)}.legend-current{fill:#f8eadb;stroke:#b35d00;stroke-width:2}.legend-selected{fill:#e2efe7;stroke:#2d6a4f;stroke-width:2}
+</style><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#2d6a4f"/></marker></defs>
+<rect width="1000" height="420" fill="#ffffff"/><text x="500" y="40" text-anchor="middle" class="title">Choose the lowest local raster score</text><text x="500" y="68" text-anchor="middle" class="subtitle">Moore neighborhood: eight surrounding cells plus the center</text>
+<g transform="translate(48 92)">
+<rect x="0" y="0" width="90" height="90" class="cell"/><rect x="90" y="0" width="90" height="90" class="cell"/><rect x="180" y="0" width="90" height="90" class="selected"/>
+<rect x="0" y="90" width="90" height="90" class="cell"/><rect x="90" y="90" width="90" height="90" class="current"/><rect x="180" y="90" width="90" height="90" class="cell"/>
+<rect x="0" y="180" width="90" height="90" class="cell"/><rect x="90" y="180" width="90" height="90" class="cell"/><rect x="180" y="180" width="90" height="90" class="cell"/>
+<text x="45" y="56" text-anchor="middle" class="score">9</text><text x="135" y="56" text-anchor="middle" class="score">8</text><text x="225" y="45" text-anchor="middle" class="score">4</text><text x="225" y="69" text-anchor="middle" class="component">3 + 1</text>
+<text x="45" y="146" text-anchor="middle" class="score">9</text><text x="135" y="137" text-anchor="middle" class="score">8</text><text x="135" y="160" text-anchor="middle" class="component">6 + 2</text><text x="225" y="146" text-anchor="middle" class="score">6</text>
+<text x="45" y="236" text-anchor="middle" class="score">10</text><text x="135" y="236" text-anchor="middle" class="score">9</text><text x="225" y="236" text-anchor="middle" class="score">7</text>
+<path d="M155 116 L191 83" class="arrow"/>
+</g>
+<g transform="translate(53 385)"><rect x="0" y="0" width="19" height="19" rx="2" class="legend-current"/><text x="28" y="16" class="note">current cell</text><rect x="137" y="0" width="19" height="19" rx="2" class="legend-selected"/><text x="165" y="16" class="note">selected minimum</text></g>
+<rect x="360" y="92" width="592" height="300" rx="14" class="panel"/><text x="656" y="130" text-anchor="middle" class="heading">Local decision</text>
+<rect x="389" y="151" width="534" height="58" rx="10" class="card"/><text x="416" y="181" class="num">1</text><text x="456" y="179" class="rule">cell score = elevation + water level</text><text x="456" y="199" class="note">The current and selected cells show the two components.</text>
+<rect x="389" y="221" width="534" height="58" rx="10" class="card"/><text x="416" y="251" class="num">2</text><text x="456" y="249" class="rule">candidates = center + valid Moore neighbors</text><text x="456" y="269" class="note">Edge and corner cells have fewer valid neighbors.</text>
+<rect x="389" y="291" width="534" height="72" rx="10" class="card"/><text x="416" y="322" class="num">3</text><text x="456" y="319" class="rule">choose the candidate with the lowest score</text><text x="456" y="344" class="note">The center remains an option when it is already the minimum.</text>
+</svg>
