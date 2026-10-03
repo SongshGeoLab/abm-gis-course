@@ -1,0 +1,518 @@
+---
+title: "GIS and Modelling Approaches"
+subtitle: "From maps that describe to models that explain"
+author: "Shuang Song"
+date: 2026-10-06
+format: revealjs
+---
+
+## Today's question
+
+::: {.big-question}
+If it rains on Jena,<br>**where does the water go?**
+:::
+
+. . .
+
+A map shows **what is there**. A model asks **what happens**.
+
+Today we answer the question twice, with two kinds of model, using only GIS data.
+
+::: {.notes}
+⏱ 0:00 → 1:30
+
+- Start with a question everyone can picture: rain falling on the hills around Jena.
+- Yesterday and this morning were about describing the world with GIS: raster, vector, maps, workflows.
+- A model adds *rules* on top of the data, so we can ask "what would happen?".
+- Plan for 30 minutes: 5 min what a model is, 10 min rivers from a DEM, 10 min raindrops as agents, 5 min take-home and the afternoon exercise.
+:::
+
+## What is a model?
+
+A **simplified version of the world**, built to answer **one question**.
+
+::: {.flow}
+::: {.box}
+**Input data**
+what we know\
+*an elevation map*
+:::
+
+[→]{.arrow}
+
+::: {.box}
+**Rules**
+how we think it works\
+*water flows downhill*
+:::
+
+[→]{.arrow}
+
+::: {.box .fill}
+**Output**
+what we learn\
+*where the rivers are*
+:::
+:::
+
+. . .
+
+You already know one kind of model: **a map** is also a simplification of the world.
+
+::: {.notes}
+⏱ 1:30 → 3:00
+
+- Link to Freg's talk "What are maps?": a map leaves out almost everything to show one thing clearly. A model does the same, but it also *computes*.
+- The middle box is the new part. The rules can be a formula, a computer program, or a set of instructions for many agents.
+- Keep it simple: no model is "true". A good model is useful for its question.
+:::
+
+## GIS and models work as a loop
+
+::: {.flow}
+::: {.box}
+**GIS**
+data in\
+*DEM · land use · roads*
+:::
+
+[→]{.arrow}
+
+::: {.box .fill}
+**Model**
+apply rules\
+*once, or step by step*
+:::
+
+[→]{.arrow}
+
+::: {.box}
+**GIS**
+results out\
+*raster · points · lines*
+:::
+
+[→]{.arrow}
+
+::: {.box}
+**Map & check**
+compare with reality\
+*then improve the model*
+:::
+:::
+
+. . .
+
+Everything from this course so far is the **language of the model**:
+
+- **raster** → a grid of cells the model can compute on
+- **vector** → points, lines and polygons the model can move along or inside
+- **CRS** → tells the model how far apart things really are
+
+::: {.notes}
+⏱ 3:00 → 4:30
+
+- The point of this slide: modelling is not a different world. It reads GIS layers and writes GIS layers.
+- That is why QGIS is useful even if you never write a model yourself: you prepare its inputs and you check its outputs.
+- CRS matters: a model that says "flow to the steepest neighbour" needs distances in metres, not degrees.
+:::
+
+## Three families of models
+
+| | **Statistical / ML** | **Process-based** | **Agent-based** |
+|---|---|---|---|
+| Idea | learn a pattern **from data** | apply a known rule **to every place** | let many **individuals** act and interact |
+| Water example | predict flooded areas from past floods | water flows downhill → **rivers** | raindrops move and pile up → **lakes** |
+| In this course | Mina, 11:00 | **today, part 1** | **today, part 2** |
+
+. . .
+
+Same landscape, same question, **different ways of thinking**.
+
+::: {.notes}
+⏱ 4:30 → 6:00
+
+- Mina already showed the first family: models that learn from data.
+- Today we look at the other two. Both start from rules we write down ourselves.
+- Process-based: the same rule is applied to every cell of the map at once.
+- Agent-based: we create "actors" (here, raindrops) that each follow the rule and move over time.
+- No family is better. They answer different questions.
+:::
+
+## PART 1 · Rivers from a DEM {.section-slide
+   background-image="/assets/section_bg.png"
+   background-size="contain"
+   background-position="center"}
+
+::: {.notes}
+⏱ 6:00
+
+- A process-based model, done entirely in QGIS. No programming.
+:::
+
+## The input: a digital elevation model (DEM)
+
+:::: {.columns}
+::: {.column width="58%"}
+![](/assets/abm-gis/img/dem_jena_elevation.png){width="100%"}
+
+[Copernicus DEM GLO-30 © DLR e.V. 2010–2014 and © Airbus Defence and Space GmbH 2014–2018, provided under COPERNICUS by the European Union and ESA]{.credit}
+:::
+::: {.column width="42%"}
+- A **raster**: every cell stores one **height** in metres
+- Cells are **30 m × 30 m**
+- About **22 × 19 km** around Jena
+- CRS: **EPSG:25832** (UTM 32N, metres)
+
+::: {.fragment}
+The Saale valley is easy to see.\
+**Can a computer find the rivers from heights alone?**
+:::
+:::
+::::
+
+::: {.notes}
+⏱ 6:00 → 7:30
+
+- Ask: where do you think the rivers are? Most people point to the blue valley. That is our "mental model".
+- The DEM is free: Copernicus GLO-30 covers the whole world. File: `_demo/dem/jena_dem.tif`.
+- We use a projected CRS in metres on purpose. A model that compares slopes needs the same units for distance and height.
+:::
+
+## The rule: water flows to the lowest neighbour
+
+![](/assets/abm-gis/img/dem_d8_idea.svg){width="78%" fig-align="center"}
+
+::: {.incremental}
+1. **Flow direction:** each cell sends its water to the **steepest downhill** of its 8 neighbours
+2. **Flow accumulation:** count how many cells drain **through** each cell
+:::
+
+::: {.notes}
+⏱ 7:30 → 9:30
+
+- Left: the numbers are heights. Follow the arrows: water always goes to the neighbour that drops most steeply.
+- Right: start from the top and pass the counts down the arrows. Each cell counts itself (1) plus everything that flows into it.
+- The bottom-right cell collects all 16 cells. That is the outlet.
+- This method is called **D8** (8 directions). It is the classic method in GIS hydrology.
+- Big counts = a lot of water passes here = probably a river.
+:::
+
+## Flow accumulation around Jena
+
+:::: {.columns}
+::: {.column width="58%"}
+![](/assets/abm-gis/img/dem_jena_accumulation.png){width="100%"}
+:::
+::: {.column width="42%"}
+- Each cell: how much land **drains through it**
+- Darker blue = more water
+- A log scale, because a few cells drain **hundreds** of km², most drain almost nothing
+
+::: {.fragment}
+A **network** appears, even though we never drew a river.
+:::
+:::
+::::
+
+::: {.notes}
+⏱ 9:30 → 10:30
+
+- Count × cell area = drainage area. One cell is 30 × 30 m = 0.0009 km².
+- Nobody told the computer where the rivers are. One simple rule, applied to every cell, produces the network.
+:::
+
+## Choose a threshold → a river network
+
+:::: {.columns}
+::: {.column width="58%"}
+![](/assets/abm-gis/img/dem_jena_streams.png){width="100%"}
+:::
+::: {.column width="42%"}
+**Rule:** a cell is a river if at least **1 km²** drains through it.
+
+- light blue: 1–20 km²
+- dark blue: more than 20 km²
+
+::: {.fragment}
+The threshold is **our choice**.
+
+- 0.1 km² → many tiny gullies
+- 10 km² → only main valleys
+:::
+:::
+::::
+
+::: {.notes}
+⏱ 10:30 → 11:30
+
+- The threshold is a modelling decision. There is no single correct value; it depends on climate, soil, and the question.
+- 1 km² at 30 m cells = about 1,111 cells. You'll type this number into QGIS this afternoon.
+- Try two thresholds in the exercise and compare.
+:::
+
+## Is the model right? Check it against reality
+
+:::: {.columns}
+::: {.column width="50%"}
+::: {.incremental}
+- **Edges:** the Saale brings water from far **upstream, outside our map**. The model cannot see it, so the Saale looks small.
+- **Surface, not ground:** this DEM includes **buildings, bridges and trees**, so in Jena the water can take odd paths.
+- **Flat areas and pits:** the valley floor is flat; holes in the DEM must be **filled** first.
+:::
+:::
+::: {.column width="50%"}
+::: {.fragment}
+::: {.callout-tip}
+## How to check
+Add an **OpenStreetMap** basemap in QGIS and compare the modelled rivers with the real ones.
+Where do they match? Where not, and why?
+:::
+:::
+
+::: {.fragment}
+> All models are wrong, but some are useful. — George Box
+:::
+:::
+::::
+
+::: {.notes}
+⏱ 11:30 → 13:00
+
+- This slide matters more than the result. Beginners trust the output too much.
+- Edge effect: if the map does not cover the whole catchment, accumulation at the edges is too small. In QGIS (r.watershed) such cells get *negative* values, which is a warning sign.
+- Copernicus is a DSM (digital surface model). A DTM (terrain only) would be better in cities.
+- "Fill sinks" is the standard first step; r.watershed handles it for you.
+:::
+
+## In QGIS: one tool does all of this
+
+[QGIS]{.tag .qgis}
+
+1. **Processing ▸ Toolbox**, search **`r.watershed`** (GRASS)
+2. *Elevation*: `jena_dem.tif`
+3. *Minimum size of exterior watershed basin*: **`1111`** cells (≈ 1 km²)
+4. Tick the outputs you want:
+   - *Number of cells that drain through each cell* → flow accumulation
+   - *Stream segments* → the river network
+   - *Unique label for each watershed basin* → catchments
+5. **Run**, then style the result (*Singleband pseudocolor*)
+
+::: {.callout-note}
+No `r.watershed`? Ask us in the practical, or open the ready-made results in `_demo/outputs/dem/`.
+:::
+
+::: {.notes}
+⏱ 13:00 → 15:00
+
+- r.watershed comes from GRASS GIS, which most QGIS installers include. If the Toolbox shows no GRASS tools, check *Settings ▸ Options ▸ Processing ▸ Providers*.
+- The threshold is in **cells**, not km². That is why the CRS and cell size matter.
+- Show it live if there is time; otherwise this is the first exercise of the afternoon.
+- For the curious: `_demo/python/river_network.py` does the same three steps in about 60 lines of NumPy.
+:::
+
+## PART 2 · Raindrops as agents {.section-slide
+   background-image="/assets/section_bg.png"
+   background-size="contain"
+   background-position="center"}
+
+::: {.notes}
+⏱ 15:00
+
+- Same question, different kind of model: instead of one rule applied to every cell once, we follow many individual raindrops through time.
+:::
+
+## What is an agent-based model?
+
+Many small **agents** that each follow simple **rules**, step by step.
+
+::: {.flow}
+::: {.box}
+**Agents**
+the actors\
+*raindrops*
+:::
+::: {.box}
+**Environment**
+where they live\
+*a DEM (GIS raster)*
+:::
+::: {.box}
+**Rules**
+what they do\
+*move to the lowest neighbour*
+:::
+::: {.box}
+**Time**
+repeat\
+*500 new drops every step*
+:::
+:::
+
+. . .
+
+Agents can also be **people, households, animals or farms** moving on roads, living in districts or using land.
+
+::: {.notes}
+⏱ 15:00 → 16:30
+
+- One raindrop = one agent. It knows where it is and what is around it.
+- The environment comes straight from GIS: here, an elevation raster.
+- In social science, agents are usually people or households and the environment is vector data: districts, parcels, roads. The idea is the same.
+:::
+
+## The raindrop's rule
+
+:::: {.columns}
+::: {.column width="60%"}
+![](/assets/abm-gis/img/ch08_raster_neighborhood.svg){width="100%"}
+
+[Figure: *Python for Agent-Based Modeling*, Chapter 8]{.credit}
+:::
+::: {.column width="40%"}
+::: {.incremental}
+1. Look at **my cell** and its **8 neighbours**
+2. Score each cell: **height + water already there**
+3. Move to the **lowest score**
+4. Reach the map edge → **flow out**
+:::
+
+::: {.fragment}
+Almost the same rule as Part 1, with one difference: **water piles up**.
+:::
+:::
+::::
+
+::: {.notes}
+⏱ 16:30 → 18:00
+
+- Walk through the picture: the centre scores 6 + 2 = 8; the upper-right scores 3 + 1 = 4, the lowest, so the drop moves there.
+- The difference to Part 1: water left by earlier drops raises the score. So the landscape changes as the model runs.
+- The score is a simple teaching rule, not real physics.
+:::
+
+## Run it: lakes emerge
+
+:::: {.columns}
+::: {.column width="62%"}
+![](/assets/abm-gis/img/ch08_rainfall_run_metrics.gif){width="100%"}
+
+[Elevation near Crater Lake, Oregon · data: Crooks et al. (2019), CC BY-SA 4.0 · model: Mesa-Geo, *Python for Agent-Based Modeling*, Ch. 8]{.credit}
+:::
+::: {.column width="38%"}
+- 12 steps × 500 drops = 6,000 drops
+- about **5,700 stay** on the map, about **300 flow out**
+
+::: {.fragment}
+Nobody told the model where the lakes are.\
+**Lakes emerge** from many drops following one rule.
+:::
+:::
+::::
+
+::: {.notes}
+⏱ 18:00 → 19:30
+
+- Before playing the GIF, ask students to guess where water will collect.
+- The left map shows water level; the right chart shows contained vs outflow over time.
+- "Emergence": a pattern at the large scale (lakes) from simple rules at the small scale (drops). This is the core idea of agent-based modelling.
+:::
+
+## GIS in, GIS out (in Python)
+
+[Mesa-Geo]{.tag .mesa}
+
+```python
+import mesa_geo as mg
+
+# GIS → model: every raster cell becomes a model cell with an "elevation"
+layer = mg.RasterLayer.from_file("crater_lake_elevation.asc", model=model,
+                                 cell_cls=LakeCell, attr_name="elevation")
+
+for _ in range(12):        # run the model for 12 steps
+    model.step()
+
+# model → GIS: save the water on every cell as a GeoTIFF for QGIS
+layer.to_file("water_level.tif", attr_name="water_level", driver="GTiff")
+```
+
+The model's world **is** a GIS layer: it reads a raster and writes a raster.
+
+::: {.notes}
+⏱ 19:30 → 21:00
+
+- No need to understand every line. Point to the first and the last statement: reading a raster file, writing a raster file.
+- The raindrops themselves can also be saved, as points in a GeoPackage (`raindrops.gpkg`).
+- Full code: `_demo/python/export_rainfall.py` and py4abm Chapter 8.
+- Mesa-Geo is the GIS extension of Mesa, the main Python library for agent-based models.
+:::
+
+## Two models, one landscape
+
+| | **Part 1: Process-based** | **Part 2: Agent-based** |
+|---|---|---|
+| Who follows the rule? | every **cell** | every **raindrop** |
+| Time | computed **once** | step by step |
+| Does the landscape change? | no | yes: **water piles up** |
+| Typical result | river network, catchments | lakes, paths, **change over time** |
+| Tool | QGIS (`r.watershed`) | Python (Mesa-Geo) |
+
+. . .
+
+Both read **GIS data** in, and write **GIS data** out.
+
+::: {.notes}
+⏱ 21:00 → 22:30
+
+- Process-based: fast, standard, good for "where are the rivers?".
+- Agent-based: slower, but you can ask "what happens over time?" and "what if the individuals behave differently?". It is most useful when the individuals are *different* from each other, like people.
+:::
+
+## Take-home messages
+
+::: {.incremental}
+1. A **model** is a simplification built to answer **one question**. GIS layers are its **inputs and outputs**.
+2. The **same landscape** can be modelled as **cells following a rule** (process-based) or **individuals following a rule** (agent-based).
+3. Always **check** a model against reality, and know its **choices**: map edges, data quality, thresholds.
+:::
+
+::: {.notes}
+⏱ 22:30 → 24:00
+
+- Repeat the opening question: where does the water go? We answered it twice, and each answer showed something different.
+:::
+
+## This afternoon · Try it yourself
+
+:::: {.columns}
+::: {.column width="55%"}
+**A · Rivers from a DEM** (QGIS, no code)
+
+1. Open `jena_dem.tif`, make a **hillshade**
+2. Run **`r.watershed`** with threshold **1111**
+3. Run it again with **11111** (≈ 10 km²). What changes?
+4. Add an **OpenStreetMap** basemap. Do the rivers match?
+
+**B · Look at an agent-based model's output**
+
+5. Open `water_level.tif` and `raindrops.gpkg`
+6. Style the water; make `0` transparent. Where are the lakes?
+:::
+::: {.column width="45%"}
+**Resources**
+
+- *Python for Agent-Based Modeling*, Ch. 8\
+  <https://github.com/abmind-community/py4abm>
+- Mesa-Geo: <https://mesa-geo.readthedocs.io>
+- GRASS `r.watershed` manual\
+  <https://grass.osgeo.org/grass-stable/manuals/r.watershed.html>
+- Crooks, Malleson, Manley & Heppenstall (2019), *Agent-Based Modelling and Geographical Information Systems*
+:::
+::::
+
+::: {.notes}
+⏱ 24:00 → 25:00, then questions
+
+- Exercise A needs only QGIS. Exercise B uses files produced by the model in Part 2.
+- Python users: `_demo/python/` has the scripts that made every figure in this talk.
+:::

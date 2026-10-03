@@ -5,13 +5,12 @@ from mesa-examples/gis/rainfall and the ABMGIS book): raindrops fall on an
 elevation raster, move to the lowest neighbouring cell (elevation + water),
 and flow out when they reach row 0 or column 0.
 
-Outputs (in ../outputs/python/):
+Outputs (in ../outputs/abm/):
     water_level.tif   raster, one band, water per cell
     raindrops.gpkg    points, one row per raindrop still on the map
-    raindrops.csv     the same points as a plain x, y table
 
-Run with the py4abm environment:
-    ../../../py4abm/.venv/bin/python export_rainfall.py
+Needs mesa-geo (``pip install mesa-geo``). Run from this folder:
+    python export_rainfall.py
 """
 
 from __future__ import annotations
@@ -25,14 +24,14 @@ import numpy as np
 from shapely.geometry import Point
 
 HERE = Path(__file__).resolve().parent
-ELEVATION = HERE.parent / "netlogo" / "elevation.asc"
-OUTPUTS = HERE.parent / "outputs" / "python"
+ELEVATION = HERE.parent / "dem" / "crater_lake_elevation.asc"
+OUTPUTS = HERE.parent / "outputs" / "abm"
 
 SEED = 202408
 RAIN_RATE = 500
 WATER_HEIGHT = 5
 STEPS = 12
-CRS = "EPSG:4326"  # assumed: elevation.asc ships without a .prj
+CRS = "EPSG:4326"  # the .asc has no CRS inside; crater_lake_elevation.prj records it
 
 
 class LakeCell(mg.Cell):
@@ -73,7 +72,7 @@ class Rainfall(mesa.Model):
         super().__init__(rng=seed)
         self.space = mg.GeoSpace(crs=CRS, warn_crs_conversion=False)
 
-        # Step 1: load the elevation raster into cells
+        # GIS -> model: load the elevation raster into cells
         self.layer = mg.RasterLayer.from_file(
             str(elevation_file),
             model=self,
@@ -116,25 +115,21 @@ def main():
         model.step()
         print(f"step {model.steps:2d}: contained={model.contained:5d} outflow={model.outflow:4d}")
 
-    # Step 4a: export a raster (cells -> GeoTIFF)
+    # model -> GIS: export a raster (cells -> GeoTIFF)
     model.layer.to_file(
         str(OUTPUTS / "water_level.tif"), attr_name="water_level", driver="GTiff"
     )
 
-    # Step 4b: export agents as points (GeoAgents -> GeoPackage)
+    # model -> GIS: export agents as points (GeoAgents -> GeoPackage)
     drops = model.space.get_agents_as_GeoDataFrame(Raindrop)
     drops = drops[["unique_id", "created_step", "moves", "geometry"]]
     drops.to_file(OUTPUTS / "raindrops.gpkg", layer="raindrops", driver="GPKG")
 
-    # Plan B: a plain CSV with x, y columns
-    table = drops.assign(x=drops.geometry.x, y=drops.geometry.y).drop(columns="geometry")
-    table.to_csv(OUTPUTS / "raindrops.csv", index=False)
-
     # Record what was exported
     metadata = {
         "model": "Rainfall (Mesa-Geo)",
-        "input": "elevation.asc (ABMGIS, CC BY-SA 4.0)",
-        "crs": CRS + " (assumed, not embedded in elevation.asc)",
+        "input": "crater_lake_elevation.asc (ABMGIS, CC BY-SA 4.0)",
+        "crs": CRS,
         "seed": SEED,
         "rain_rate": RAIN_RATE,
         "water_height": WATER_HEIGHT,
@@ -143,7 +138,7 @@ def main():
         "outflow": model.outflow,
         "fields": {
             "water_level.tif": "water per cell = retained raindrops x water_height (model units)",
-            "raindrops.*": "unique_id, created_step, moves; point at the cell centre",
+            "raindrops.gpkg": "unique_id, created_step, moves; point at the cell centre",
         },
         "versions": {"mesa": mesa.__version__, "mesa_geo": mg.__version__},
     }

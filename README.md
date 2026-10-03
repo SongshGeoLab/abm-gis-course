@@ -1,3 +1,12 @@
+# GIS and Modelling Approaches
+
+Slides for the lecture *GIS and Modelling Approaches* (IMPRS GIS course, Tuesday 6 October, 11:45–12:15), built on the MPG reveal.js theme below.
+
+- Deck: `gis_modelling.qmd` → `quarto render gis_modelling.qmd`
+- Demo data, exercises and scripts: [`_demo/README.md`](_demo/README.md)
+
+---
+
 
 # MPG Reveal.js Theme (Quarto)
 

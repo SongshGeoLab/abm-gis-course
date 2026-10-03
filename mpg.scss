@@ -156,7 +156,7 @@ section.section-slide h2 {
   padding-left: 0.9rem;
   color: #333;
 }
-.reveal table { border-collapse: collapse; font-size: 0.7em; }
+.reveal table { border-collapse: collapse; font-size: 0.85em; }
 .reveal table th, .reveal table td {
   border-bottom: 1px solid #e5e5e5;
   padding: 0.35rem 0.6rem;
@@ -198,25 +198,6 @@ section.title-slide .date {
 section.title-slide .author { top: 64%; }
 section.title-slide .date   { top: 71%; }
 
-/* 5-step progress tracker shown at the top of workflow slides */
-.reveal .steps {
-  display: flex;
-  gap: 0.4em;
-  margin: -0.4em 0 0.5em;
-  font-size: 0.5em;
-}
-.reveal .steps span {
-  padding: 0.15em 0.8em;
-  border-radius: 999px;
-  background: #eef3f3;
-  color: #7a8a8a;
-}
-.reveal .steps span.on {
-  background: var(--brand-primary);
-  color: #ffffff;
-  font-weight: 700;
-}
-
 /* Boxes for flow diagrams and concept cards */
 .reveal .flow {
   display: flex;
@@ -243,22 +224,7 @@ section.title-slide .date   { top: 71%; }
   font-weight: 700;
 }
 
-/* Screenshot placeholder: replace with ![](/assets/abm-gis/img/...) */
-.reveal .placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 16em;
-  padding: 0.8em;
-  border: 3px dashed var(--brand-primary);
-  border-radius: 14px;
-  background: #f3f8f8;
-  color: #4d6b69;
-  font-size: 0.6em;
-  text-align: center;
-}
-
-/* Tool labels above the NetLogo / Mesa-Geo columns */
+/* Tool labels (QGIS, Mesa-Geo) above how-to slides */
 .reveal .tag {
   display: inline-block;
   padding: 0.1em 0.7em;
@@ -266,9 +232,16 @@ section.title-slide .date   { top: 71%; }
   font-size: 0.6em;
   font-weight: 700;
 }
-.reveal .tag.netlogo { background: #e7eef8; color: #0b5fad; }
 .reveal .tag.mesa    { background: #e3f1ef; color: #006c66; }
 .reveal .tag.qgis    { background: #edf5e3; color: #4a7a1f; }
+
+/* Opening question on the first slide */
+.reveal .big-question {
+  margin: 1.2em 0 0.8em;
+  font-size: 2em;
+  line-height: 1.3;
+  color: var(--brand-primary);
+}
 
 /* Small grey credit line under figures */
 .reveal .credit {

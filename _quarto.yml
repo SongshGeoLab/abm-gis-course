@@ -8,7 +8,7 @@ format:
     theme: [default, mpg.scss]
     logo: /assets/crest.png        # root-relative path is safest
     slide-number: true
-    footer: "Max Planck Institute of Geoanthropology | YOUR NAME"
+    footer: "Max Planck Institute of Geoanthropology | Shuang Song"
     transition: fade
     controls: true
     toc: false

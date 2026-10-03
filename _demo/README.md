@@ -1,74 +1,54 @@
-# From Model to Map: demo files
+# GIS and Modelling Approaches: demo files
 
-Files for the lecture *From Model to Map: bringing agent-based model outputs into GIS and QGIS*.
+Files for the lecture *GIS and Modelling Approaches* (`gis_modelling.qmd`).
 
 ```
 _demo/
-├── netlogo/
-│   ├── rainfall_gis.nlogo   the Rainfall model with export buttons (NetLogo 6.4)
-│   ├── elevation.asc        input elevation raster (no CRS inside)
-│   └── wgs84.prj            the CRS we assume for elevation.asc (EPSG:4326)
-├── python/
-│   ├── export_rainfall.py       Mesa-Geo Rainfall → GeoTIFF, GeoPackage, CSV
-│   └── export_geoschelling.py   py4abm GeoSchelling → GeoPackage (4 layers)
-└── outputs/
-    ├── netlogo/   files written by the NetLogo model at tick 12
-    └── python/    files written by the two Python scripts
+├── dem/
+│   ├── jena_dem.tif                 DEM around Jena, 30 m, EPSG:25832 (Part 1)
+│   ├── crater_lake_elevation.asc    elevation for the raindrop model (Part 2)
+│   └── crater_lake_elevation.prj    its CRS (EPSG:4326)
+├── outputs/
+│   ├── dem/   flow_accumulation_km2.tif, streams.tif   (ready-made Part 1 results)
+│   └── abm/   water_level.tif, raindrops.gpkg           (raindrop model after 12 steps)
+└── python/
+    ├── river_network.py    fill sinks → flow direction → flow accumulation → streams
+    ├── d8_diagram.py       the 4×4 flow-direction figure on the slides
+    └── export_rainfall.py  Mesa-Geo raindrop model → GeoTIFF + GeoPackage
 ```
 
-## 1. Run the model
+## Exercise A · Rivers from a DEM (QGIS only)
 
-**NetLogo (no programming needed)**
+1. Drag `dem/jena_dem.tif` into QGIS. Make a hillshade: *Raster ▸ Analysis ▸ Hillshade*.
+2. Open *Processing ▸ Toolbox* and search for **r.watershed**.
+   - *Elevation*: `jena_dem.tif`
+   - *Minimum size of exterior watershed basin*: `1111` (cells; 1111 × 30 m × 30 m ≈ 1 km²)
+   - Outputs: *Number of cells that drain through each cell*, *Stream segments*, *Unique label for each watershed basin*
+3. Run it again with `11111` (≈ 10 km²) and compare the two stream networks.
+4. Add an OpenStreetMap basemap (*Browser ▸ XYZ Tiles ▸ OpenStreetMap*) and compare the modelled rivers with real ones.
 
-1. Open `netlogo/rainfall_gis.nlogo` in NetLogo 6.4. Keep `elevation.asc` and `wgs84.prj` in the same folder.
-2. Press **setup**, then **go**. Press **go** again to stop at about tick 12.
-3. Press the three export buttons. The files are written next to the model:
+If r.watershed is not in the Toolbox, open the ready-made results in `outputs/dem/` instead.
 
-| Button | File | Type |
-|---|---|---|
-| 4a water -> raster | `water_tick12.asc` + `.prj` | raster |
-| 4b raindrops -> points | `raindrops_tick12.geojson`, `raindrops_tick12.shp` (+ .dbf .shx .prj) | points |
-| Plan B: raindrops -> CSV | `raindrops_tick12.csv` (columns `x`, `y` in EPSG:4326) | table |
+Things to notice: accumulation cells with **negative values** receive water from outside the map (edge effect), and the DEM is a surface model, so buildings and bridges in Jena change the flow paths.
 
-**Python / Mesa-Geo**
+## Exercise B · Output of an agent-based model
 
-Use the environment of the [py4abm](https://github.com/abmind-community/py4abm) book (mesa 3.5, mesa-geo 0.9):
+1. Open `outputs/abm/water_level.tif` and `outputs/abm/raindrops.gpkg`. Both are in EPSG:4326.
+2. Style the water with *Singleband pseudocolor*. Under *Transparency*, set `0` as no data.
+3. Where did lakes form? Compare with `dem/crater_lake_elevation.asc`.
+
+## Python (optional)
 
 ```bash
+pip install mesa-geo rasterio matplotlib
 cd _demo/python
-../../../py4abm/.venv/bin/python export_rainfall.py
-../../../py4abm/.venv/bin/python export_geoschelling.py
+python river_network.py     # writes outputs/dem/ and the slide figures
+python export_rainfall.py   # writes outputs/abm/
 ```
 
-| File | Type | CRS |
-|---|---|---|
-| `water_level.tif` | raster, water per cell | EPSG:4326 |
-| `raindrops.gpkg`, `raindrops.csv` | points | EPSG:4326 |
-| `geoschelling.gpkg` (`regions_step00`, `regions_final`, `people_step00`, `people_final`) | polygons and points | EPSG:32618 |
-| `*_metadata.json` | seed, parameters, versions, field meanings | |
+## Data
 
-## 2. Open the files in QGIS
-
-1. **Load.** Drag `.tif`, `.asc`, `.gpkg`, `.geojson` or `.shp` files into the map. For a CSV, use *Layer ▸ Add Layer ▸ Add Delimited Text Layer…*, set X field = `x`, Y field = `y`, and Geometry CRS = `EPSG:4326`.
-2. **Check the CRS.** Look under *Layer Properties ▸ Information*. NetLogo's Shapefile `.prj` may appear as a custom CRS. If so, right-click ▸ *Layer CRS ▸ Set Layer CRS* → `EPSG:4326`. Add a basemap under *Browser ▸ XYZ Tiles ▸ OpenStreetMap*.
-3. **Style.**
-   - Elevation: *Hillshade*.
-   - Water: *Singleband pseudocolor*, with `0` set as no data under *Transparency*.
-   - Raindrops: small markers, or the *Heatmap* renderer.
-4. **Analyse.**
-   - Wet area: use *Raster Calculator* with `"water_level@1" > 0`. For areas in m², reproject to EPSG:32610, then run *Raster layer unique values report*.
-   - GeoSchelling: use *Graduated* symbology on `a_share`, and compare `regions_step00` with `regions_final`.
-5. **Share.** In *Project ▸ New Print Layout…*, add a title, legend, scale bar, north arrow and credits.
-
-## Things to notice
-
-- NetLogo exports **every** turtle variable (`COLOR`, `HEADING`, `PEN-MODE`…) as a field. Remove the ones you don't need with *Refactor fields*.
-- NetLogo's `xcor` and `ycor` are **patch coordinates**, not map coordinates. The CSV export converts them with the GIS extension (`gis:envelope-of`).
-- NetLogo writes `.asc` with the cell size rounded to 6 decimals, so the grid can be shifted by up to about 3 m. You won't see this on a map.
-- The two tools use different random number generators, so their drop counts differ slightly. The lakes form in the same places.
-
-## Credits
-
-- Elevation data and the original Rainfall model: Crooks, Malleson, Manley & Heppenstall (2019), *Agent-Based Modelling and Geographical Information Systems*, CC BY-SA 4.0.
-- Mesa-Geo Rainfall example: <https://github.com/mesa/mesa-examples/tree/main/gis/rainfall>
-- GeoSchelling model and DC tracts: py4abm Chapter 8. Tracts are from the U.S. Census Bureau TIGER/Line 2025.
+- Jena DEM: Copernicus DEM GLO-30, clipped to 11.44–11.74° E, 50.83–50.99° N and reprojected to EPSG:25832.
+  © DLR e.V. 2010–2014 and © Airbus Defence and Space GmbH 2014–2018, provided under COPERNICUS by the European Union and ESA.
+- Crater Lake elevation: from Crooks, Malleson, Manley & Heppenstall (2019), *Agent-Based Modelling and Geographical Information Systems*, CC BY-SA 4.0.
+  The raindrop model follows the Rainfall example in *Python for Agent-Based Modeling*, Chapter 8 (<https://github.com/abmind-community/py4abm>).
