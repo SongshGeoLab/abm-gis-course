@@ -24,7 +24,7 @@ Today we answer the question twice, with two kinds of model, using only GIS data
 - Start with a question everyone can picture: rain falling on the hills around Jena.
 - Yesterday and this morning were about describing the world with GIS: raster, vector, maps, workflows.
 - A model adds *rules* on top of the data, so we can ask "what would happen?".
-- Plan for 30 minutes: 5 min what a model is, 10 min rivers from a DEM, 10 min raindrops as agents, 5 min take-home and the afternoon exercise.
+- Plan for 25 minutes plus questions: 6 min what a model is, 9 min rivers from a DEM, 7 min raindrops as agents, 3 min take-home and the afternoon exercise.
 :::
 
 ## What is a model?
@@ -258,7 +258,7 @@ The threshold is **our choice**.
 ::: {.incremental}
 - **Edges:** the Saale brings water from far **upstream, outside our map**. The model cannot see it, so the Saale looks small.
 - **Surface, not ground:** this DEM includes **buildings, bridges and trees**, so in Jena the water can take odd paths.
-- **Flat areas and pits:** the valley floor is flat; holes in the DEM must be **filled** first.
+- **Flat areas and pits:** small holes in the DEM would trap the water, so they are **filled** first; on the flat valley floor the path is a guess.
 :::
 :::
 ::: {.column width="50%"}
@@ -282,7 +282,7 @@ Where do they match? Where not, and why?
 - This slide matters more than the result. Beginners trust the output too much.
 - Edge effect: if the map does not cover the whole catchment, accumulation at the edges is too small. In QGIS (r.watershed) such cells get *negative* values, which is a warning sign.
 - Copernicus is a DSM (digital surface model). A DTM (terrain only) would be better in cities.
-- "Fill sinks" is the standard first step; r.watershed handles it for you.
+- "Fill sinks" is the standard first step in most tools. r.watershed instead routes water through the holes with a least-cost search, so you do not need a separate step.
 :::
 
 ## In QGIS: one tool does all of this
@@ -292,11 +292,12 @@ Where do they match? Where not, and why?
 1. **Processing ▸ Toolbox**, search **`r.watershed`** (GRASS)
 2. *Elevation*: `jena_dem.tif`
 3. *Minimum size of exterior watershed basin*: **`1111`** cells (≈ 1 km²)
-4. Tick the outputs you want:
+4. Tick **Enable Single Flow Direction (D8) flow**, the rule from our slides
+5. Tick the outputs you want:
    - *Number of cells that drain through each cell* → flow accumulation
    - *Stream segments* → the river network
    - *Unique label for each watershed basin* → catchments
-5. **Run**, then style the result (*Singleband pseudocolor*)
+6. **Run**, then style the result (*Singleband pseudocolor*)
 
 ::: {.callout-note}
 No `r.watershed`? Ask us in the practical, or open the ready-made results in `_demo/outputs/dem/`.
@@ -305,10 +306,11 @@ No `r.watershed`? Ask us in the practical, or open the ready-made results in `_d
 ::: {.notes}
 ⏱ 13:00 → 15:00
 
-- r.watershed comes from GRASS GIS, which most QGIS installers include. If the Toolbox shows no GRASS tools, check *Settings ▸ Options ▸ Processing ▸ Providers*.
+- r.watershed comes from GRASS GIS, which most QGIS installers include. If the Toolbox shows no GRASS tools, enable the *GRASS GIS provider* under *Plugins ▸ Manage and Install Plugins* (older versions: *Settings ▸ Options ▸ Processing ▸ Providers*).
+- Without the D8 tick, r.watershed spreads water over several downhill neighbours (multiple flow direction). The rivers look similar, but the accumulation map looks smoother than our slides.
 - The threshold is in **cells**, not km². That is why the CRS and cell size matter.
 - Show it live if there is time; otherwise this is the first exercise of the afternoon.
-- For the curious: `_demo/python/river_network.py` does the same three steps in about 60 lines of NumPy.
+- For the curious: `_demo/python/river_network.py` does the same three steps in about 50 lines of NumPy.
 :::
 
 ## PART 2 · Raindrops as agents {.section-slide
@@ -374,7 +376,7 @@ Agents can also be **people, households, animals or farms** moving on roads, liv
 1. Look at **my cell** and its **8 neighbours**
 2. Score each cell: **height + water already there**
 3. Move to the **lowest score**
-4. Reach the map edge → **flow out**
+4. Reach the top or left edge → **flow out**
 :::
 
 ::: {.fragment}
@@ -414,6 +416,7 @@ Nobody told the model where the lakes are.\
 ⏱ 18:00 → 19:30
 
 - Before playing the GIF, ask students to guess where water will collect.
+- The GIF is the py4abm run (5,706 stay / 294 out). The files for the exercise come from `export_rainfall.py` with another random draw (5,659 / 341); rain falls at random, so numbers differ slightly between runs.
 - The left map shows water level; the right chart shows contained vs outflow over time.
 - "Emergence": a pattern at the large scale (lakes) from simple rules at the small scale (drops). This is the core idea of agent-based modelling.
 :::
@@ -442,6 +445,7 @@ The model's world **is** a GIS layer: it reads a raster and writes a raster.
 ⏱ 19:30 → 21:00
 
 - No need to understand every line. Point to the first and the last statement: reading a raster file, writing a raster file.
+- This is shortened: the full script also creates the model, sets the CRS and adds an empty `water_level` layer before running.
 - The raindrops themselves can also be saved, as points in a GeoPackage (`raindrops.gpkg`).
 - Full code: `_demo/python/export_rainfall.py` and py4abm Chapter 8.
 - Mesa-Geo is the GIS extension of Mesa, the main Python library for agent-based models.

@@ -114,7 +114,8 @@ def main():
     with rasterio.open(DEM_FILE) as src:
         dem = src.read(1).astype("float64")
         profile = src.profile
-        cell_km2 = abs(src.res[0] * src.res[1]) / 1e6
+        cell_x, cell_y = src.res
+        cell_km2 = cell_x * cell_y / 1e6
         b = src.bounds
     extent = (b.left, b.right, b.bottom, b.top)
 
@@ -130,7 +131,7 @@ def main():
     print(f"largest catchment in view: {area_km2.max():.0f} km²")
     print(f"river cells (≥ {STREAM_THRESHOLD_KM2} km²): {streams.sum():,}")
 
-    hillshade = LightSource(azdeg=315, altdeg=45).hillshade(dem, vert_exag=3, dx=30, dy=30)
+    hillshade = LightSource(azdeg=315, altdeg=45).hillshade(dem, vert_exag=3, dx=cell_x, dy=cell_y)
 
     def shade(ax, alpha=1.0):
         ax.imshow(hillshade, cmap="gray", extent=extent, alpha=alpha)

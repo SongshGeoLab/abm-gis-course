@@ -7,7 +7,7 @@ _demo/
 ├── dem/
 │   ├── jena_dem.tif                 DEM around Jena, 30 m, EPSG:25832 (Part 1)
 │   ├── crater_lake_elevation.asc    elevation for the raindrop model (Part 2)
-│   └── crater_lake_elevation.prj    its CRS (EPSG:4326)
+│   └── crater_lake_elevation.prj    its CRS (EPSG:4326, assumed: the source grid has none)
 ├── outputs/
 │   ├── dem/   flow_accumulation_km2.tif, streams.tif   (ready-made Part 1 results)
 │   └── abm/   water_level.tif, raindrops.gpkg           (raindrop model after 12 steps)
@@ -23,13 +23,14 @@ _demo/
 2. Open *Processing ▸ Toolbox* and search for **r.watershed**.
    - *Elevation*: `jena_dem.tif`
    - *Minimum size of exterior watershed basin*: `1111` (cells; 1111 × 30 m × 30 m ≈ 1 km²)
+   - Tick *Enable Single Flow Direction (D8) flow*, so the tool uses the same rule as the slides
    - Outputs: *Number of cells that drain through each cell*, *Stream segments*, *Unique label for each watershed basin*
 3. Run it again with `11111` (≈ 10 km²) and compare the two stream networks.
 4. Add an OpenStreetMap basemap (*Browser ▸ XYZ Tiles ▸ OpenStreetMap*) and compare the modelled rivers with real ones.
 
-If r.watershed is not in the Toolbox, open the ready-made results in `outputs/dem/` instead.
+If r.watershed is not in the Toolbox, enable the *GRASS GIS provider* plugin, or open the ready-made results in `outputs/dem/` (made by `python/river_network.py`; accumulation is in km² there, not cells).
 
-Things to notice: accumulation cells with **negative values** receive water from outside the map (edge effect), and the DEM is a surface model, so buildings and bridges in Jena change the flow paths.
+Things to notice: in the r.watershed output, accumulation cells with **negative values** receive water from outside the map (edge effect), and the DEM is a surface model, so buildings and bridges in Jena change the flow paths.
 
 ## Exercise B · Output of an agent-based model
 

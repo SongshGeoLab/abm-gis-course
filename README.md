@@ -40,8 +40,11 @@ A reusable **Quarto + reveal.js** slide template matching the Max Planck (MPG) l
 .
 ├─ _quarto.yml          # reveal.js config & site settings
 ├─ mpg.scss             # the theme
-├─ slides.qmd           # your deck (add more .qmd files for more decks)
+├─ slides.qmd           # template example deck
+├─ gis_modelling.qmd    # GIS and Modelling Approaches lecture
+├─ _demo/               # data, exercises and scripts for the lecture
 └─ assets/              # logos, backgrounds, images (subfolders OK)
+   ├─ abm-gis/img/      # figures for gis_modelling.qmd
    ├─ logo.svg
    ├─ title_bg.png      # 16:9 background for title slide (e.g., 3840×2160)
    └─ section_bg.png    # 16:9 background for section slides
