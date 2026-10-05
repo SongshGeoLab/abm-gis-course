@@ -1,0 +1,44 @@
+# Rebuild the students' exercise zip and publish it to the "exercises" release
+# whenever the exercise files change. The release is replaced each time, so the
+# download link stays the same:
+#   https://github.com/<owner>/<repo>/releases/download/exercises/gis-modelling-exercises.zip
+name: Publish exercise files
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "_demo/**"
+      - "!_demo/python/**"           # figure scripts are not in the zip
+      - "!_demo/outputs/qgis/**"     # raw slide screenshots are not in the zip
+      - ".github/workflows/exercise-zip.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: exercise-zip
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the zip
+        run: bash _demo/make_exercise_zip.sh
+
+      - name: Replace the "exercises" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete exercises --cleanup-tag --yes || true
+          gh release create exercises dist/gis-modelling-exercises.zip \
+            --target "$GITHUB_SHA" \
+            --title "Exercise files" \
+            --latest \
+            --notes "Files for the afternoon exercises of *GIS and Modelling Approaches*. Unzip and follow README.md.
+
+          Built from ${GITHUB_SHA::7} on $(date -u +%Y-%m-%d)."

@@ -2,6 +2,8 @@
 
 Files for the lecture *GIS and Modelling Approaches* (`gis_modelling.qmd`).
 
+Students get these files as `gis-modelling-exercises.zip` from the repository's [*Exercise files* release](https://github.com/SongshGeoLab/abm-gis-course/releases/tag/exercises). It is rebuilt automatically whenever the files change (`make_exercise_zip.sh`, run by `.github/workflows/exercise-zip.yml`). The zip leaves out `python/` and `outputs/qgis/`, which only matter for making the slides.
+
 ```
 _demo/
 ├── dem/
@@ -13,8 +15,8 @@ _demo/
 ├── outputs/
 │   ├── dem/   flow_accumulation_km2.tif, streams.tif   (ready-made Part 1 results)
 │   ├── abm/   water_level.tif, raindrops.gpkg           (raindrop model after 12 steps)
-│   └── qgis/  raw QGIS screenshots for the OpenStreetMap slide
-└── python/
+│   └── qgis/  raw QGIS screenshots for the OpenStreetMap slide (repository only)
+└── python/                          scripts that made the slide figures (repository only)
     ├── river_network.py    fill sinks → flow direction → flow accumulation → streams
     ├── dem_resolution.py   real terrain vs DEMs at 120 / 300 / 900 m cells (slide figure)
     ├── d8_diagram.py       the 4×4 flow-direction figure on the slides
@@ -55,7 +57,7 @@ Things to notice: in the r.watershed output, accumulation cells with **negative 
 2. Style the water with *Singleband pseudocolor*. Under *Transparency*, set `0` as no data.
 3. Where did lakes form? Compare with `dem/crater_lake_elevation.asc`.
 
-## Python (optional)
+## Python (optional, repository only)
 
 ```bash
 pip install mesa-geo rasterio matplotlib pillow requests

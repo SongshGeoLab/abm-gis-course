@@ -4,6 +4,7 @@ Slides for the lecture *GIS and Modelling Approaches* (IMPRS GIS course, Tuesday
 
 - Deck: `gis_modelling.qmd` → `quarto render gis_modelling.qmd`
 - Demo data, exercises and scripts: [`_demo/README.md`](_demo/README.md)
+- Students' exercise files: `gis-modelling-exercises.zip` in the [*Exercise files* release](https://github.com/SongshGeoLab/abm-gis-course/releases/tag/exercises), rebuilt by GitHub Actions whenever `_demo/` changes
 
 ---
 
