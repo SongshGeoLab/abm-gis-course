@@ -243,6 +243,11 @@ section.title-slide .date   { top: 71%; }
   color: var(--brand-primary);
 }
 
+.reveal .big-question.compact {
+  margin-top: 0.6em;
+  font-size: 1.6em;
+}
+
 /* Small grey credit line under figures */
 .reveal .credit {
   display: block;

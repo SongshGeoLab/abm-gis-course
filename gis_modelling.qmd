@@ -8,22 +8,38 @@ format: revealjs
 
 ## Today's question
 
-::: {.big-question}
+:::: {.columns}
+::: {.column width="52%"}
+::: {.big-question .compact}
 If it rains on Jena,<br>**where does the water go?**
 :::
 
-. . .
+::: {.fragment}
+This official flood map looks like a plain description: where the Saale floods.
 
+But you cannot go out and measure a flood with a 1% chance each year. **The map was computed by a model:** terrain + river flow + rules of how water moves.
+:::
+
+::: {.fragment}
 A map shows **what is there**. A model asks **what happens**.
+:::
+:::
+::: {.column width="48%"}
+![](/assets/abm-gis/img/flood_jena.png){height="800px"}
 
-Today we answer the question twice, with two kinds of model, using only GIS data.
+[Flood hazard map (EU Floods Directive): BfG national portal, data TLUBN Thüringen · Basemap © basemap.de / BKG]{.credit}
+:::
+::::
 
 ::: {.notes}
 ⏱ 0:00 → 1:30
 
-- Start with a question everyone can picture: rain falling on the hills around Jena.
+- Start with a question everyone can picture: rain falling on the hills around Jena. All that rain ends up in the Saale, and when the river gets too full, it floods.
 - Yesterday and this morning were about describing the world with GIS: raster, vector, maps, workflows.
-- A model adds *rules* on top of the data, so we can ask "what would happen?".
+- Point at the map: blue is where the Saale floods in a "100-year flood" (HQ100), darker is deeper; the darkest line is the river bed itself. Orange is only flooded in an even rarer, extreme flood. Many of you walk through these areas every day.
+- "100-year" does not mean once every 100 years. It means a 1% chance in any year: Jena had a big flood in 2013, and the next one can still come next year.
+- Ask: how could anyone know this? Such a flood cannot be measured street by street. The authority ran a hydraulic model on a terrain model of the valley, and the map is its output.
+- So even a map that "shows what is there" often comes out of a model. A model adds *rules* on top of the data, so we can ask "what would happen?". Today we answer the question twice, with two kinds of model, using only GIS data.
 - Plan for 25 minutes plus questions: 6 min what a model is, 9 min rivers from a DEM, 7 min raindrops as agents, 3 min take-home and the afternoon exercise.
 :::
 
@@ -59,12 +75,16 @@ what we learn\
 
 You already know one kind of model: **a map** is also a simplification of the world.
 
+. . .
+
+> All models are "wrong", but some models are useful. — after George Box
+
 ::: {.notes}
 ⏱ 1:30 → 3:00
 
 - Link to Freg's talk "What are maps?": a map leaves out almost everything to show one thing clearly. A model does the same, but it also *computes*.
 - The middle box is the new part. The rules can be a formula, a computer program, or a set of instructions for many agents.
-- Keep it simple: no model is "true". A good model is useful for its question.
+- Keep it simple: no model is "true". Every model leaves things out, so in that sense it is "wrong". A good model is useful for its question. We come back to this when we check our river model.
 :::
 
 ## GIS and models work as a loop
@@ -172,11 +192,32 @@ The Saale valley is easy to see.\
 ::::
 
 ::: {.notes}
-⏱ 6:00 → 7:30
+⏱ 6:00 → 7:00
 
 - Ask: where do you think the rivers are? Most people point to the blue valley. That is our "mental model".
 - The DEM is free: Copernicus GLO-30 covers the whole world. File: `_demo/dem/jena_dem.tif`.
 - We use a projected CRS in metres on purpose. A model that compares slopes needs the same units for distance and height.
+:::
+
+## From real terrain to a DEM: one height per square {.nostretch}
+
+![](/assets/abm-gis/img/dem_resolution.png){width="90%" fig-align="center"}
+
+::: {.incremental}
+- A DEM cuts the landscape into **squares** and keeps **one height** per square
+- **Bigger squares** → fewer numbers, but small valleys and ridges **disappear**
+- Pick the cell size for **your question**: a hillside needs metres, a continent can use kilometres
+:::
+
+[A 3.6 × 3.6 km patch of the Saale valley south of Jena; left: the 30 m DEM drawn as a smooth surface, the others average its cells; heights stretched 4× · Copernicus DEM GLO-30]{.credit}
+
+::: {.notes}
+⏱ 7:00 → 8:00
+
+- Real terrain is continuous: there is a height at every point. A computer can only store a finite list of numbers, so the DEM lays a grid over the land and stores one (average) height per square.
+- Point at the side valley in the middle: at 120 m it is still there, at 300 m it is a few steps, at 900 m it is gone. Sixteen numbers cannot describe this landscape.
+- This is the first modelling decision, made before any rule: the resolution. Our Jena DEM uses 30 m cells.
+- Even 30 m is a simplification: the leftmost picture is itself a 30 m DEM, drawn smoothly.
 :::
 
 ## The rule: water flows to the lowest neighbour
@@ -189,7 +230,7 @@ The Saale valley is easy to see.\
 :::
 
 ::: {.notes}
-⏱ 7:30 → 9:30
+⏱ 8:00 → 9:30
 
 - Left: the numbers are heights. Follow the arrows: water always goes to the neighbour that drops most steeply.
 - Right: start from the top and pass the counts down the arrows. Each cell counts itself (1) plus everything that flows into it.
@@ -271,7 +312,7 @@ Where do they match? Where not, and why?
 :::
 
 ::: {.fragment}
-> All models are wrong, but some are useful. — George Box
+> Remember: all models are "wrong". **Useful** means you know *where* it is wrong.
 :::
 :::
 ::::

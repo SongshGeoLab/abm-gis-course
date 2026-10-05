@@ -13,7 +13,9 @@ _demo/
 │   └── abm/   water_level.tif, raindrops.gpkg           (raindrop model after 12 steps)
 └── python/
     ├── river_network.py    fill sinks → flow direction → flow accumulation → streams
+    ├── dem_resolution.py   real terrain vs DEMs at 120 / 300 / 900 m cells (slide figure)
     ├── d8_diagram.py       the 4×4 flow-direction figure on the slides
+    ├── flood_map.py        official Jena flood hazard map for the first slide (needs internet)
     └── export_rainfall.py  Mesa-Geo raindrop model → GeoTIFF + GeoPackage
 ```
 
@@ -41,14 +43,17 @@ Things to notice: in the r.watershed output, accumulation cells with **negative 
 ## Python (optional)
 
 ```bash
-pip install mesa-geo rasterio matplotlib
+pip install mesa-geo rasterio matplotlib pillow requests
 cd _demo/python
 python river_network.py     # writes outputs/dem/ and the slide figures
 python export_rainfall.py   # writes outputs/abm/
+python dem_resolution.py    # slide figure: one DEM at three resolutions
+python flood_map.py         # slide figure: Jena flood hazard map (needs internet)
 ```
 
 ## Data
 
+- Jena flood hazard map (first slide): national flood hazard maps of the German Federal Institute of Hydrology (BfG, <https://geoportal.bafg.de/karten/HWRM/>), data from TLUBN Thüringen; basemap © basemap.de / BKG (CC BY 4.0). The flood data licence was not checked; verify it before publishing the slides.
 - Jena DEM: Copernicus DEM GLO-30, clipped to 11.44–11.74° E, 50.83–50.99° N and reprojected to EPSG:25832.
   © DLR e.V. 2010–2014 and © Airbus Defence and Space GmbH 2014–2018, provided under COPERNICUS by the European Union and ESA.
 - Crater Lake elevation: from Crooks, Malleson, Manley & Heppenstall (2019), *Agent-Based Modelling and Geographical Information Systems*, CC BY-SA 4.0.
