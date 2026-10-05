@@ -288,7 +288,7 @@ The threshold is **our choice**.
 ⏱ 10:30 → 11:30
 
 - The threshold is a modelling decision. There is no single correct value; it depends on climate, soil, and the question.
-- 1 km² at 30 m cells = about 1,111 cells. You'll type this number into QGIS this afternoon.
+- This afternoon you type 1 (km²) into our QGIS tool. Tools that count cells need 1 km² ÷ (30 m × 30 m) ≈ 1,111 cells.
 - Try two thresholds in the exercise and compare.
 :::
 
@@ -321,37 +321,44 @@ Where do they match? Where not, and why?
 ⏱ 11:30 → 13:00
 
 - This slide matters more than the result. Beginners trust the output too much.
-- Edge effect: if the map does not cover the whole catchment, accumulation at the edges is too small. In QGIS (r.watershed) such cells get *negative* values, which is a warning sign.
+- Edge effect: if the map does not cover the whole catchment, accumulation at the edges is too small: our tool shows the Saale far too small. (GRASS r.watershed even marks such cells with *negative* values.)
 - Copernicus is a DSM (digital surface model). A DTM (terrain only) would be better in cities.
 - "Fill sinks" is the standard first step in most tools. r.watershed instead routes water through the holes with a least-cost search, so you do not need a separate step.
 :::
 
-## In QGIS: one tool does all of this
+## In QGIS: rivers from a DEM
 
+:::: {.columns}
+::: {.column width="36%" .qgis-steps}
 [QGIS]{.tag .qgis}
 
-1. **Processing ▸ Toolbox**, search **`r.watershed`** (GRASS)
-2. *Elevation*: `jena_dem.tif`
-3. *Minimum size of exterior watershed basin*: **`1111`** cells (≈ 1 km²)
-4. Tick **Enable Single Flow Direction (D8) flow**, the rule from our slides
-5. Outputs: *Number of cells that drain through each cell* (accumulation) and *Stream segments* (rivers)
-6. **Run**, then style the result (*Singleband pseudocolor*)
+1. *Processing ▸ Toolbox*, Python icon ▸ **Add Script to Toolbox…** ▸ [`rivers_from_dem.py`](/_demo/qgis/rivers_from_dem.py){download="rivers_from_dem.py"} (only once)
+2. Double-click **Rivers from a DEM** under *Scripts ▸ GIS and Modelling* (or search *rivers*)
+3. *Elevation*: `jena_dem.tif`\
+   *River threshold*: **1** km²
+4. **Run**: two new layers, *flow accumulation* and *streams*
 
 ::: {.callout-note}
-## No GRASS? (common on Mac with QGIS 4)
-Use our tool instead: download [rivers_from_dem.py](/_demo/qgis/rivers_from_dem.py){download="rivers_from_dem.py"}, then *Processing Toolbox* ▸ Python icon ▸ **Add Script to Toolbox…**
-It appears under *Scripts ▸ GIS and Modelling*; the threshold is in **km²**.
+## Have GRASS?
+`r.watershed` does the same: threshold **1111** cells (≈ 1 km²), tick *Enable Single Flow Direction (D8) flow*.
 :::
+:::
+::: {.column width="64%"}
+![](/assets/abm-gis/img/qgis_rivers_tool.png){width="100%"}
+
+[Our tool: fill sinks → D8 → flow accumulation → threshold, the steps on the last slides · Screenshot: QGIS 4.2]{.credit}
+:::
+::::
 
 ::: {.notes}
 ⏱ 13:00 → 14:00
 
-- r.watershed comes from GRASS GIS. Windows/Linux installers usually include it; if the Toolbox shows no GRASS tools, enable the *GRASS GIS provider* under *Plugins ▸ Manage and Install Plugins*.
-- On macOS, users report that the QGIS 4 package does not include GRASS, and even with GRASS installed it often fails with "Could not locate GRASS GIS folder" (QGIS issue #65363). Don't debug this in class: use `rivers_from_dem.py`. It does exactly the steps on our slides (D8, sinks filled), so its result matches the figures on our slides (not r.watershed exactly); it takes a few seconds for the Jena DEM.
-- Without the D8 tick, r.watershed spreads water over several downhill neighbours (multiple flow direction). The rivers look similar, but the accumulation map looks smoother than our slides.
-- The threshold is in **cells**, not km². That is why the CRS and cell size matter.
+- Our tool does exactly the steps on the slides (fill sinks, D8, accumulation, threshold) with NumPy inside QGIS. Its result matches our figures. It takes a few seconds for the Jena DEM, and needs nothing but QGIS.
+- Why not the classic GRASS tool r.watershed? On macOS, users report that the QGIS 4 package does not include GRASS, and even with GRASS installed it often fails with "Could not locate GRASS GIS folder" (QGIS issue #65363). Don't debug this in class.
+- Students who do have GRASS can use r.watershed: threshold in **cells** (1111 ≈ 1 km² at 30 m) and tick D8; without the tick it spreads water over several downhill neighbours and the accumulation map looks smoother than ours.
+- Our threshold is in **km²**: the tool converts cells to area using the cell size, which is why the DEM must be in metres.
 - Show it live if there is time; otherwise this is the first exercise of the afternoon.
-- For the curious: `_demo/python/river_network.py` does the same three steps in about 50 lines of NumPy.
+- For the curious: open `rivers_from_dem.py` in a text editor. It is under 200 lines and follows the slides step by step.
 :::
 
 ## In QGIS: add an OpenStreetMap basemap
@@ -534,8 +541,8 @@ The model's world **is** a GIS layer: it reads a raster and writes a raster.
 | Who follows the rule? | every **cell** | every **raindrop** |
 | Time | computed **once** | step by step |
 | Does the landscape change? | no | yes: **water piles up** |
-| Typical result | river network, catchments | lakes, paths, **change over time** |
-| Tool | QGIS (`r.watershed`) | Python (Mesa-Geo) |
+| Typical result | river network | lakes, paths, **change over time** |
+| Tool | QGIS (*Rivers from a DEM*) | Python (Mesa-Geo) |
 
 . . .
 
@@ -569,9 +576,8 @@ Both read **GIS data** in, and write **GIS data** out.
 **A · Rivers from a DEM** (QGIS, no code)
 
 1. Open `jena_dem.tif`, make a **hillshade**
-2. Run **`r.watershed`** with threshold **1111**\
-   (no GRASS? **Rivers from a DEM** with **1** km²)
-3. Run it again with **11111** cells or **10** km². What changes?
+2. Run **Rivers from a DEM** with threshold **1** km²
+3. Run it again with **10** km². What changes?
 4. Add an **OpenStreetMap** basemap. Do the rivers match?
 
 **B · Look at an agent-based model's output**
@@ -585,8 +591,8 @@ Both read **GIS data** in, and write **GIS data** out.
 - *Python for Agent-Based Modeling*, Ch. 8\
   <https://github.com/abmind-community/py4abm>
 - Mesa-Geo: <https://mesa-geo.readthedocs.io>
-- GRASS `r.watershed` manual\
-  <https://grass.osgeo.org/grass-stable/manuals/r.watershed.html>
+- Our QGIS tool, to read or reuse:\
+  [rivers_from_dem.py](/_demo/qgis/rivers_from_dem.py){download="rivers_from_dem.py"}
 - Crooks, Malleson, Manley & Heppenstall (2019), *Agent-Based Modelling and Geographical Information Systems*
 :::
 ::::

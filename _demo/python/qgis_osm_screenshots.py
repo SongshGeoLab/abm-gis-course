@@ -3,7 +3,7 @@
 Runs *inside* QGIS and clicks through what students do: Browser ▸ XYZ Tiles ▸
 New Connection…, fill in OpenStreetMap, then add it under the modelled
 streams. Uses a fresh, throw-away QGIS profile, so your own settings stay
-untouched. Afterwards run qgis_osm_figure.py to add the numbered markers.
+untouched. Afterwards run qgis_figures.py to add the numbered markers.
 
 Run from this folder (macOS example, QGIS 4.2; QGIS closes by itself):
     /Applications/QGIS-final-4_2_0.app/Contents/MacOS/QGIS-final-4_2_0 \\

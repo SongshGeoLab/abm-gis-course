@@ -17,39 +17,37 @@ _demo/
 │   ├── abm/   water_level.tif, raindrops.gpkg           (raindrop model after 12 steps)
 │   └── qgis/  raw QGIS screenshots for the OpenStreetMap slide (repository only)
 └── python/                          scripts that made the slide figures (repository only)
-    ├── river_network.py    fill sinks → flow direction → flow accumulation → streams
-    ├── dem_resolution.py   real terrain vs DEMs at 120 / 300 / 900 m cells (slide figure)
-    ├── d8_diagram.py       the 4×4 flow-direction figure on the slides
-    ├── flood_map.py        official Jena flood hazard map for the first slide (needs internet)
-    ├── qgis_osm_screenshots.py  runs inside QGIS: screenshots of adding the OSM basemap
-    ├── qgis_osm_figure.py  numbered markers on those screenshots (slide figure)
-    └── export_rainfall.py  Mesa-Geo raindrop model → GeoTIFF + GeoPackage
+    ├── river_network.py             fill sinks → flow direction → flow accumulation → streams
+    ├── dem_resolution.py            real terrain vs DEMs at 120 / 300 / 900 m cells (slide figure)
+    ├── d8_diagram.py                the 4×4 flow-direction figure on the slides
+    ├── flood_map.py                 official Jena flood hazard map for the first slide (needs internet)
+    ├── qgis_tool_screenshots.py     runs inside QGIS: screenshots of our river tool
+    ├── qgis_osm_screenshots.py      runs inside QGIS: screenshots of adding the OSM basemap
+    ├── qgis_figures.py              numbered markers on those screenshots (slide figures)
+    └── export_rainfall.py           Mesa-Geo raindrop model → GeoTIFF + GeoPackage
 ```
 
 ## Exercise A · Rivers from a DEM (QGIS only)
 
 1. Drag `dem/jena_dem.tif` into QGIS. Make a hillshade: *Raster ▸ Analysis ▸ Hillshade*.
-2. Open *Processing ▸ Toolbox* and search for **r.watershed**.
-   - *Elevation*: `jena_dem.tif`
-   - *Minimum size of exterior watershed basin*: `1111` (cells; 1111 × 30 m × 30 m ≈ 1 km²)
-   - Tick *Enable Single Flow Direction (D8) flow*, so the tool uses the same rule as the slides
-   - Outputs: *Number of cells that drain through each cell* (accumulation) and *Stream segments* (rivers)
-3. Run it again with `11111` (≈ 10 km²) and compare the two stream networks.
-4. Add an OpenStreetMap basemap and compare the modelled rivers with real ones. In the *Browser* panel, right-click *XYZ Tiles ▸ New Connection…*, name it `OpenStreetMap`, URL `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, then double-click it and drag it to the bottom of the *Layers* panel. (QGIS 3 often has *XYZ Tiles ▸ OpenStreetMap* already; QGIS 4 starts empty.)
+2. Add our river tool to QGIS (only once): *Processing ▸ Toolbox* ▸ Python icon ▸ *Add Script to Toolbox…* ▸ pick `qgis/rivers_from_dem.py`.
+3. Double-click *Scripts ▸ GIS and Modelling ▸ Rivers from a DEM (no GRASS)*.
+   - *Elevation (DEM)*: `jena_dem.tif`
+   - *River threshold*: `1` (km²)
+   - Run: you get two layers, *Flow accumulation (km²)* and *Streams*.
+4. Run it again with `10` km² and compare the two stream networks.
+5. Add an OpenStreetMap basemap and compare the modelled rivers with real ones. In the *Browser* panel, right-click *XYZ Tiles ▸ New Connection…*, name it `OpenStreetMap`, URL `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, then double-click it and drag it to the bottom of the *Layers* panel. (QGIS 3 often has *XYZ Tiles ▸ OpenStreetMap* already; QGIS 4 starts empty.)
 
-**No GRASS?** On macOS, QGIS 4 often cannot run GRASS tools ([QGIS issue #65363](https://github.com/qgis/QGIS/issues/65363)). Use our Processing tool instead, which needs nothing but QGIS:
+The tool follows the slides step by step: fill sinks → flow direction (D8) → flow accumulation → threshold. Its results match the ready-made files in `outputs/dem/`.
 
-1. *Processing Toolbox* ▸ Python icon ▸ *Add Script to Toolbox…* ▸ pick `qgis/rivers_from_dem.py`.
-2. Run *Scripts ▸ GIS and Modelling ▸ Rivers from a DEM (no GRASS)* with `jena_dem.tif` and a threshold of `1` km² (try `10` too).
-
-It gives the same result as the slides and as the ready-made files in `outputs/dem/` (accumulation in km², not cells). If GRASS is installed separately, starting QGIS from the Terminal like this also makes r.watershed work (adjust the two app names to your versions):
+**With GRASS:** the classic tool is *r.watershed* (threshold `1111` cells ≈ 1 km², tick *Enable Single Flow Direction (D8) flow*). On macOS, QGIS 4 often cannot run GRASS tools ([QGIS issue #65363](https://github.com/qgis/QGIS/issues/65363)); that is why we wrote our own tool. If GRASS is installed separately, starting QGIS from the Terminal like this can help (adjust the two app names to your versions):
 
 ```bash
 export GISBASE=/Applications/GRASS-8.5.app/Contents/Resources GRASS_PREFIX=$GISBASE
 open /Applications/QGIS-final-4_2_0.app
 ```
 
-Things to notice: in the r.watershed output, accumulation cells with **negative values** receive water from outside the map (edge effect), and the DEM is a surface model, so buildings and bridges in Jena change the flow paths.
+Things to notice: the Saale gets most of its water from outside the map, so the model underestimates it (edge effect; r.watershed marks such cells with **negative values**), and the DEM is a surface model, so buildings and bridges in Jena change the flow paths.
 
 ## Exercise B · Output of an agent-based model
 
@@ -66,7 +64,7 @@ python river_network.py     # writes outputs/dem/ and the slide figures
 python export_rainfall.py   # writes outputs/abm/
 python dem_resolution.py    # slide figure: one DEM at three resolutions
 python flood_map.py         # slide figure: Jena flood hazard map (needs internet)
-python qgis_osm_figure.py   # slide figure: OSM basemap in QGIS (see qgis_osm_screenshots.py first)
+python qgis_figures.py      # QGIS slide figures (take the screenshots first, see qgis_*_screenshots.py)
 ```
 
 ## Data
