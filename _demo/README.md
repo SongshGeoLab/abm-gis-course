@@ -8,14 +8,19 @@ _demo/
 │   ├── jena_dem.tif                 DEM around Jena, 30 m, EPSG:25832 (Part 1)
 │   ├── crater_lake_elevation.asc    elevation for the raindrop model (Part 2)
 │   └── crater_lake_elevation.prj    its CRS (EPSG:4326, assumed: the source grid has none)
+├── qgis/
+│   └── rivers_from_dem.py           QGIS Processing tool: rivers from a DEM without GRASS
 ├── outputs/
 │   ├── dem/   flow_accumulation_km2.tif, streams.tif   (ready-made Part 1 results)
-│   └── abm/   water_level.tif, raindrops.gpkg           (raindrop model after 12 steps)
+│   ├── abm/   water_level.tif, raindrops.gpkg           (raindrop model after 12 steps)
+│   └── qgis/  raw QGIS screenshots for the OpenStreetMap slide
 └── python/
     ├── river_network.py    fill sinks → flow direction → flow accumulation → streams
     ├── dem_resolution.py   real terrain vs DEMs at 120 / 300 / 900 m cells (slide figure)
     ├── d8_diagram.py       the 4×4 flow-direction figure on the slides
     ├── flood_map.py        official Jena flood hazard map for the first slide (needs internet)
+    ├── qgis_osm_screenshots.py  runs inside QGIS: screenshots of adding the OSM basemap
+    ├── qgis_osm_figure.py  numbered markers on those screenshots (slide figure)
     └── export_rainfall.py  Mesa-Geo raindrop model → GeoTIFF + GeoPackage
 ```
 
@@ -26,11 +31,21 @@ _demo/
    - *Elevation*: `jena_dem.tif`
    - *Minimum size of exterior watershed basin*: `1111` (cells; 1111 × 30 m × 30 m ≈ 1 km²)
    - Tick *Enable Single Flow Direction (D8) flow*, so the tool uses the same rule as the slides
-   - Outputs: *Number of cells that drain through each cell*, *Stream segments*, *Unique label for each watershed basin*
+   - Outputs: *Number of cells that drain through each cell* (accumulation) and *Stream segments* (rivers)
 3. Run it again with `11111` (≈ 10 km²) and compare the two stream networks.
-4. Add an OpenStreetMap basemap (*Browser ▸ XYZ Tiles ▸ OpenStreetMap*) and compare the modelled rivers with real ones.
+4. Add an OpenStreetMap basemap and compare the modelled rivers with real ones. In the *Browser* panel, right-click *XYZ Tiles ▸ New Connection…*, name it `OpenStreetMap`, URL `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, then double-click it and drag it to the bottom of the *Layers* panel. (QGIS 3 often has *XYZ Tiles ▸ OpenStreetMap* already; QGIS 4 starts empty.)
 
-If r.watershed is not in the Toolbox, enable the *GRASS GIS provider* plugin, or open the ready-made results in `outputs/dem/` (made by `python/river_network.py`; accumulation is in km² there, not cells).
+**No GRASS?** On macOS, QGIS 4 often cannot run GRASS tools ([QGIS issue #65363](https://github.com/qgis/QGIS/issues/65363)). Use our Processing tool instead, which needs nothing but QGIS:
+
+1. *Processing Toolbox* ▸ Python icon ▸ *Add Script to Toolbox…* ▸ pick `qgis/rivers_from_dem.py`.
+2. Run *Scripts ▸ GIS and Modelling ▸ Rivers from a DEM (no GRASS)* with `jena_dem.tif` and a threshold of `1` km² (try `10` too).
+
+It gives the same result as the slides and as the ready-made files in `outputs/dem/` (accumulation in km², not cells). If GRASS is installed separately, starting QGIS from the Terminal like this also makes r.watershed work (adjust the two app names to your versions):
+
+```bash
+export GISBASE=/Applications/GRASS-8.5.app/Contents/Resources GRASS_PREFIX=$GISBASE
+open /Applications/QGIS-final-4_2_0.app
+```
 
 Things to notice: in the r.watershed output, accumulation cells with **negative values** receive water from outside the map (edge effect), and the DEM is a surface model, so buildings and bridges in Jena change the flow paths.
 
@@ -49,6 +64,7 @@ python river_network.py     # writes outputs/dem/ and the slide figures
 python export_rainfall.py   # writes outputs/abm/
 python dem_resolution.py    # slide figure: one DEM at three resolutions
 python flood_map.py         # slide figure: Jena flood hazard map (needs internet)
+python qgis_osm_figure.py   # slide figure: OSM basemap in QGIS (see qgis_osm_screenshots.py first)
 ```
 
 ## Data

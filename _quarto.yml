@@ -2,6 +2,7 @@ project:
   type: website
   resources:
     - assets/**        # copy everything under assets
+    - _demo/qgis/*.py  # QGIS tool students download from the slides
 
 format:
   revealjs:

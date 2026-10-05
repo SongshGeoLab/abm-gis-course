@@ -334,24 +334,59 @@ Where do they match? Where not, and why?
 2. *Elevation*: `jena_dem.tif`
 3. *Minimum size of exterior watershed basin*: **`1111`** cells (≈ 1 km²)
 4. Tick **Enable Single Flow Direction (D8) flow**, the rule from our slides
-5. Tick the outputs you want:
-   - *Number of cells that drain through each cell* → flow accumulation
-   - *Stream segments* → the river network
-   - *Unique label for each watershed basin* → catchments
+5. Outputs: *Number of cells that drain through each cell* (accumulation) and *Stream segments* (rivers)
 6. **Run**, then style the result (*Singleband pseudocolor*)
 
 ::: {.callout-note}
-No `r.watershed`? Ask us in the practical, or open the ready-made results in `_demo/outputs/dem/`.
+## No GRASS? (common on Mac with QGIS 4)
+Use our tool instead: download [rivers_from_dem.py](/_demo/qgis/rivers_from_dem.py){download="rivers_from_dem.py"}, then *Processing Toolbox* ▸ Python icon ▸ **Add Script to Toolbox…**
+It appears under *Scripts ▸ GIS and Modelling*; the threshold is in **km²**.
 :::
 
 ::: {.notes}
-⏱ 13:00 → 15:00
+⏱ 13:00 → 14:00
 
-- r.watershed comes from GRASS GIS, which most QGIS installers include. If the Toolbox shows no GRASS tools, enable the *GRASS GIS provider* under *Plugins ▸ Manage and Install Plugins* (older versions: *Settings ▸ Options ▸ Processing ▸ Providers*).
+- r.watershed comes from GRASS GIS. Windows/Linux installers usually include it; if the Toolbox shows no GRASS tools, enable the *GRASS GIS provider* under *Plugins ▸ Manage and Install Plugins*.
+- On macOS, users report that the QGIS 4 package does not include GRASS, and even with GRASS installed it often fails with "Could not locate GRASS GIS folder" (QGIS issue #65363). Don't debug this in class: use `rivers_from_dem.py`. It does exactly the steps on our slides (D8, sinks filled), so its result matches the figures on our slides (not r.watershed exactly); it takes a few seconds for the Jena DEM.
 - Without the D8 tick, r.watershed spreads water over several downhill neighbours (multiple flow direction). The rivers look similar, but the accumulation map looks smoother than our slides.
 - The threshold is in **cells**, not km². That is why the CRS and cell size matter.
 - Show it live if there is time; otherwise this is the first exercise of the afternoon.
 - For the curious: `_demo/python/river_network.py` does the same three steps in about 50 lines of NumPy.
+:::
+
+## In QGIS: add an OpenStreetMap basemap
+
+:::: {.columns}
+::: {.column width="36%" .qgis-steps}
+[QGIS]{.tag .qgis}
+
+1. **Browser** panel: right-click **XYZ Tiles** ▸ **New Connection…**
+2. Name `OpenStreetMap`, URL:\
+   [`https://tile.openstreetmap.org/{z}/{x}/{y}.png`]{.url}\
+   then **OK**
+3. Double-click **OpenStreetMap** in the Browser
+4. **Layers** panel: drag it to the **bottom**, so your results stay on top
+
+::: {.callout-tip}
+In QGIS 3, *XYZ Tiles ▸ OpenStreetMap* is often already there: go straight to step 3.
+:::
+:::
+::: {.column width="64%"}
+![](/assets/abm-gis/img/qgis_osm_basemap.png){width="100%"}
+
+[Red: our modelled rivers (`outputs/dem/streams.tif`, same as *Rivers from a DEM*) · Map data © OpenStreetMap contributors · Screenshot: QGIS 4.2]{.credit}
+:::
+::::
+
+::: {.notes}
+⏱ 14:00 → 15:00
+
+- A basemap is the quickest reality check for any model output: put the real world under your result.
+- A fresh QGIS 4 install has an empty *XYZ Tiles* entry, so students need steps 1–2. QGIS 3 usually ships the OpenStreetMap connection already.
+- Needs internet: the tiles are downloaded while you pan and zoom.
+- The tiles are in web mercator (EPSG:3857), our DEM is in EPSG:25832. QGIS reprojects on the fly, so they line up.
+- Zoom in on Jena: the modelled Saale follows the real one, but in the flat valley floor and the city the red lines wander. That is the DSM and flat-area problem from two slides ago.
+- When you publish a map with this basemap, write "© OpenStreetMap contributors". The OSM tile server is for viewing, not for bulk downloading.
 :::
 
 ## PART 2 · Raindrops as agents {.section-slide
@@ -534,8 +569,9 @@ Both read **GIS data** in, and write **GIS data** out.
 **A · Rivers from a DEM** (QGIS, no code)
 
 1. Open `jena_dem.tif`, make a **hillshade**
-2. Run **`r.watershed`** with threshold **1111**
-3. Run it again with **11111** (≈ 10 km²). What changes?
+2. Run **`r.watershed`** with threshold **1111**\
+   (no GRASS? **Rivers from a DEM** with **1** km²)
+3. Run it again with **11111** cells or **10** km². What changes?
 4. Add an **OpenStreetMap** basemap. Do the rivers match?
 
 **B · Look at an agent-based model's output**
@@ -558,6 +594,6 @@ Both read **GIS data** in, and write **GIS data** out.
 ::: {.notes}
 ⏱ 24:00 → 25:00, then questions
 
-- Exercise A needs only QGIS. Exercise B uses files produced by the model in Part 2.
+- Both exercises need only QGIS plus the course files (`jena_dem.tif`, the model outputs, `rivers_from_dem.py`). Exercise B uses files produced by the model in Part 2.
 - Python users: `_demo/python/` has the scripts that made every figure in this talk.
 :::

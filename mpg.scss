@@ -248,6 +248,21 @@ section.title-slide .date   { top: 71%; }
   font-size: 1.6em;
 }
 
+/* Click-by-click QGIS instructions next to a screenshot */
+.reveal .qgis-steps {
+  font-size: 0.75em;
+}
+
+.reveal .qgis-steps code {
+  font-size: 0.8em;
+}
+
+/* A URL to type in: smaller, kept on one line */
+.reveal .qgis-steps .url code {
+  font-size: 0.68em;
+  white-space: nowrap;
+}
+
 /* Small grey credit line under figures */
 .reveal .credit {
   display: block;
